@@ -1,9 +1,15 @@
 package io.github.yashladha.chat_application;
 
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -23,7 +29,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
-import java.util.Iterator;
 
 public class Chat_person extends Activity {
 
@@ -100,6 +105,7 @@ public class Chat_person extends Activity {
                     String dateSnap = UniqueId();
                     SendAllMessage(tempObj, dateSnap, ref_chat, ref_user);
                     readMessages.add("\"" + dateSnap + "\"");
+                    messageList.smoothScrollToPosition(readMessages.size());
                 }
             }
         });
@@ -109,9 +115,14 @@ public class Chat_person extends Activity {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (s != null) {
                     if (!readMessages.contains(s)) {
+                        // TODO: Implement a smart logic for listener
+//                        PlayNotificationSound();
+
                         messages.add(dataSnapshot.getValue(Message.class));
                         messageAdapter.notifyDataSetChanged();
                         readMessages.add(s);
+
+                        messageList.smoothScrollToPosition(readMessages.size());
                     }
                 }
             }
@@ -136,6 +147,12 @@ public class Chat_person extends Activity {
 
             }
         });
+    }
+
+    private void PlayNotificationSound() {
+        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), soundUri);
+        r.play();
     }
 
     @NonNull
