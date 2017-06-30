@@ -89,64 +89,57 @@ public class Chat_person extends Activity {
             }
         });
 
-        final MessageAdapter messageAdapter = new MessageAdapter(messages);
-        messageList.setAdapter(messageAdapter);
+        if (curUid != null) {
+            final MessageAdapter messageAdapter = new MessageAdapter(curUid, messages);
+            messageList.setAdapter(messageAdapter);
 
-        submit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Submit message button pressed");
-                String textMessage = editText.getText().toString();
-                Message tempObj = new Message(Boolean.TRUE, textMessage);
-                if (!textMessage.equals("")) {
-                    editText.setText("");
-                    messages.add(tempObj);
-                    messageAdapter.notifyDataSetChanged();
-                    String dateSnap = UniqueId();
-                    SendAllMessage(tempObj, dateSnap, ref_chat, ref_user);
-                    readMessages.add("\"" + dateSnap + "\"");
-                    messageList.smoothScrollToPosition(readMessages.size());
-                }
-            }
-        });
-
-        ref_user.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if (s != null) {
-                    if (!readMessages.contains(s)) {
-                        // TODO: Implement a smart logic for listener
-//                        PlayNotificationSound();
-
-                        messages.add(dataSnapshot.getValue(Message.class));
+            submit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d(TAG, "Submit message button pressed");
+                    String textMessage = editText.getText().toString();
+                    Message tempObj = new Message(curUid, textMessage);
+                    if (!textMessage.equals("")) {
+                        editText.setText("");
+                        messages.add(tempObj);
                         messageAdapter.notifyDataSetChanged();
-                        readMessages.add(s);
-
+                        String dateSnap = UniqueId();
+                        readMessages.add("\"" + dateSnap + "\"");
+                        SendAllMessage(tempObj, dateSnap, ref_chat, ref_user);
                         messageList.smoothScrollToPosition(readMessages.size());
+
                     }
                 }
-            }
+            });
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            ref_chat.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for ( DataSnapshot items : dataSnapshot.getChildren() ) {
+                        if (!readMessages.contains(items.getKey())) {
+                            // TODO: Implement a smart logic for listener
+                            // PlayNotificationSound();
 
-            }
+                            Message temp = items.getValue(Message.class);
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                            // In Case if same uid gets triggered
+                            if (!temp.getID().equals(curUid)) {
+                                Log.d(TAG, items.getKey() + " Key received");
+                                readMessages.add(items.getKey());
+                                messages.add(temp);
+                                messageAdapter.notifyDataSetChanged();
+                                messageList.smoothScrollToPosition(readMessages.size());
+                            }
+                        }
+                    }
+                }
 
-            }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+                }
+            });
+        }
     }
 
     private void PlayNotificationSound() {
@@ -162,9 +155,8 @@ public class Chat_person extends Activity {
     }
 
     private void SendAllMessage(Message tempObj, String dateSnap, DatabaseReference ref_chat, DatabaseReference ref_user) {
-        tempObj.setStatus(!tempObj.getStatus());
+        Log.d(TAG, "Database gets updated");
         ref_chat.child("\""+ dateSnap + "\"").setValue(tempObj);
-        tempObj.setStatus(!tempObj.getStatus());
         ref_user.child("\""+ dateSnap + "\"").setValue(tempObj);
     }
 

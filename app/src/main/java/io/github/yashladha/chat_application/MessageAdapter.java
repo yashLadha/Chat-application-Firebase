@@ -12,8 +12,10 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     private ArrayList<Message> messages;
     private final int SENDER = 0, RECEIVER = 1;
+    private String curUid;
 
-    public MessageAdapter(ArrayList<Message> messages) {
+    public MessageAdapter(String curUid, ArrayList<Message> messages) {
+        this.curUid = curUid;
         this.messages = messages;
     }
 
@@ -57,7 +59,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public int getItemViewType(int position) {
         Message message = messages.get(position);
-        if (message.getStatus())
+        if (message.getID().equals(curUid))
             return SENDER;
         else
             return RECEIVER;

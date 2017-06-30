@@ -60,12 +60,6 @@ public class IndexAdapter extends RecyclerView.Adapter<IndexAdapter.MyViewHolder
         public MyViewHolder(View itemView) {
             super(itemView);
             profile_name = (TextView) itemView.findViewById(R.id.tvProfileName);
-
-            Random rnd = new Random();
-            int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
-            int textColor = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
-            itemView.setBackgroundColor(color);
-            profile_name.setTextColor(textColor);
         }
     }
 }
