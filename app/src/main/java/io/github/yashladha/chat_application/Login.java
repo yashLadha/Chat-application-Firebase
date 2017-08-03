@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -18,7 +20,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class Login extends Activity {
+public class Login extends Activity implements View.OnClickListener{
 
     private String TAG = getClass().getSimpleName();
     private Button loginButton;
@@ -36,6 +38,8 @@ public class Login extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        ConstraintLayout background = (ConstraintLayout) findViewById(R.id.cl_mainactivity);
+        background.setOnClickListener(this);
         loginButton = (Button) findViewById(R.id.btnLogin);
         signupButton = (Button) findViewById(R.id.btnSignup);
         etEmail = (EditText) findViewById(R.id.email_login);
@@ -102,5 +106,15 @@ public class Login extends Activity {
     protected void onStop() {
         super.onStop();
         mAuth.removeAuthStateListener(mAuthListener);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == R.id.cl_mainactivity){
+            InputMethodManager methodmanager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            methodmanager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),0);
+
+        }
+
     }
 }
